@@ -1,0 +1,7 @@
+dname,type,lcode,model,model_type
+jpn_news_2011_1M,news,jp,ja_core_news_sm,spacy
+por_news_2020_1M,news,pt,pt_core_news_sm,spacy
+rus_news_2020_1M,news,ru,ru_core_news_sm,spacy
+fra_news_2020_1M,news,fr,fr_core_news_sm,spacy
+deu_news_2020_1M,news,de,de_core_news_sm,spacy
+swe_news_2020_1M,news,sv,swedish-lines,udpipe

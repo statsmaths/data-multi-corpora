@@ -1,45 +1,64 @@
 library(tidyverse)
+library(reticulate)
 library(cleanNLP)
 library(stringi)
 
-meta <- c(
-  "de" = "deu_news_2020_1M",
-  "fr" = "fra_news_2020_1M",
-  "jp" = "jpn_news_2011_1M",
-  "pt" = "por_news_2020_1M",
-  "ru" = "rus_news_2020_1M",
-  "sv" = "swe_news_2020_1M"
-)
+# USE THESE TO SETUP SPACY IN THE TERMINAL
+# python3 -m venv env
+# source env/bin/activate
+# pip3 install spacy
+# pip3 install cleannlp
+# python -m spacy download pt_core_news_sm
+# python -m spacy download ru_core_news_sm
+# python -m spacy download ja_core_news_sm
+# python -m spacy download fr_core_news_sm
+# python -m spacy download de_core_news_sm
 
-lname <- c(
-  "de" = "german-gsd",
-  "fr" = "french-gsd",
-  "jp" = "japanese-gsd",
-  "pt" = "portuguese-gsd",
-  "ru" = "russian-gsd",
-  "sv" = "swedish-lines"
-)
+# set the virtual environment in R
+use_virtualenv("./env", required = TRUE)
 
-for (j in seq_along(meta))
+# helper function
+save_n_parts <- function(data, fname, n)
 {
-  prefix <- names(meta)[j]
-  type <- stri_sub(stri_extract_first(meta[j], regex = "_[a-z]+_"), 2L, -2L)
-  dout <- file.path("output", sprintf("%s_%s_docs.csv.gz", prefix, type))
-  tout <- file.path("output", sprintf("%s_%s_anno.csv.gz", prefix, type))
+  id <- rep(seq_len(n), each = ceiling(nrow(data) / 3))[seq_len(nrow(data))]
+  for (k in seq_len(n))
+  {
+    fout <- sprintf("%s_part%02d.csv.bz2", fname, k)
+    write_csv(data[id == k,], fout)
+  }
+}
+
+# read metadata about all of the datasets we want to parse
+meta <- read_csv("input/meta.csv")
+
+# cycle over each dataset
+for (j in seq_len(nrow(meta)))
+{
+  prefix <- meta$lcode[j]
+  type <- meta$type[j]
+  dout <- file.path("output", sprintf("%s_%s_docs.csv.bz2", prefix, type))
+  tout <- file.path("output", sprintf("%s_%s_anno", prefix, type))
 
   if (!file.exists(dout))
   {
+    cat(sprintf("Working on %s\n", meta$dname[j]))
     docs <- read_delim(
-      file.path(meta[j], paste0(meta[j], "-sentences.txt")),
+      file.path(meta$dname[j], paste0(meta$dname[j], "-sentences.txt")),
       delim = "\t",
       col_names = c("doc_id", "text"),
       quote = ""
     )
 
-    cnlp_init_udpipe(lname[j])
+    if (meta$model_type[j] == "spacy")
+    {
+      cnlp_init_spacy(meta$model[j])
+    } else {
+      cnlp_init_udpipe(meta$model[j])
+    }
+
     anno <- cnlp_annotate(docs)$token
 
     write_csv(docs, dout)
-    write_csv(anno, tout)
+    save_n_parts(anno, tout, n = 3)
   }
 }
