@@ -5,8 +5,10 @@ rus_news_2020_1M,news,ru,ru_core_news_sm,spacy
 fra_news_2020_1M,news,fr,fr_core_news_sm,spacy
 deu_news_2020_1M,news,de,de_core_news_sm,spacy
 swe_news_2020_1M,news,sv,swedish-lines,udpipe
+ind_news_2020_1M,news,id,indonesian-gsd,udpipe
 jpn_wikipedia_2021_1M,wiki,jp,ja_core_news_sm,spacy
 por_wikipedia_2021_1M,wiki,pt,pt_core_news_sm,spacy
 rus_wikipedia_2021_1M,wiki,ru,ru_core_news_sm,spacy
 fra_wikipedia_2021_1M,wiki,fr,fr_core_news_sm,spacy
 swe_wikipedia_2021_1M,wiki,sv,swedish-lines,udpipe
+ind_wikipedia_2021_1M,wiki,id,indonesian-gsd,udpipe
